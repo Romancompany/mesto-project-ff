@@ -21,12 +21,13 @@ function createCard(element,delCard) {
 
 // @todo: Функция удаления карточки
 function deleteCard(deleteButton) {
-    deleteButton.parentElement.remove();
+    const itemCard = deleteButton.closest('.places__item');
+    itemCard.remove();
 }
 
 // @todo: Вывести карточки на страницу
-function fillCards(Cards) {
-    Cards.forEach(element => { cardContainer.append(createCard(element,deleteCard)); });
+function fillCards(cards) {
+    cards.forEach(element => { cardContainer.append(createCard(element,deleteCard)); });
 }
 
 fillCards(initialCards);
