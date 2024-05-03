@@ -1,3 +1,5 @@
+const classLike = 'card__like-button_is-active';
+const classPlaces = 'places__item';
 // Темплейт карточки
 const templateCard = document.querySelector('#card-template').content;
 // функции обработчики
@@ -49,4 +51,17 @@ function removeCard(itemCard) {
     itemCard.remove();
 }
 
-export { createCard, removeCard };
+// Обработчик лайка карточки
+function handleLikeCardClick(evt) {
+    const button = evt.target;
+    button.classList.toggle(classLike);
+}
+
+// Обработчик удаления карточки по кнопке удаления
+function handleRemoveCardClick(evt) {
+    const button = evt.target;
+    const itemCard = button.closest('.' + classPlaces);
+    removeCard(itemCard);
+}
+
+export { createCard, handleLikeCardClick, handleRemoveCardClick };
