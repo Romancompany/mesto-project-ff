@@ -37,7 +37,7 @@ function handleProfileEditClick(evt) {
     openModal(popupProfile);
 }
 
-// Прикрепляем обработчик
+// Прикрепляем обработчик редактирования профиля
 profileEditButton.addEventListener('click', handleProfileEditClick);
 
 // Обработчик по клику мышки кнопки добавления новой карточки
@@ -47,7 +47,7 @@ function handleCardAddClick(evt) {
     openModal(popupNewCard);
 }
 
-// Прикрепляем обработчик
+// Прикрепляем обработчик добавления новой карточки
 cardAddButton.addEventListener('click', handleCardAddClick);
 
 // Обработчик «отправки» формы профиля
@@ -60,25 +60,23 @@ function handleFormProfileSubmit(evt) {
     closeModal(popupProfile);
 }
 
-// Прикрепляем обработчик к форме профиля
+// Прикрепляем обработчик «отправки» к форме профиля
 formProfile.addEventListener('submit', handleFormProfileSubmit);
 
 // Обработчик «отправки» формы новой карточки
 function handleFormNewCardSubmit(evt) {
     evt.preventDefault(); 
-    const cards = [  {  name: nameNewCard.value,
-                        link: linkNewCard.value
-                     }
-                  ];
+    const card = {name: nameNewCard.value, link: linkNewCard.value}
+    const newCard = createCard(card, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
 
-    fillCards(cards);
+    cardContainer.prepend(newCard); 
     closeModal(popupNewCard);
 }
 
-// Прикрепляем обработчик к форме добавления карточки
+// Прикрепляем обработчик «отправки» к форме новой карточки
 formNewCard.addEventListener('submit', handleFormNewCardSubmit);
 
-// прикрепляем обработчик закрытия всем попап
+// Прикрепляем обработчики закрытия всех попап
 function initPopupCloseListeners() {
     const popups = [popupProfile, popupNewCard, popupImgCard];
 
@@ -92,7 +90,7 @@ function initPopupCloseListeners() {
     );
 }
 
-// прикрепляем обработчик закрытия всем попап
+// Инициализировать прикрепление обработчиков
 initPopupCloseListeners();
 
 // Заполнить страницу карточками из массива
