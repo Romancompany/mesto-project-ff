@@ -2,10 +2,6 @@ const classLike = 'card__like-button_is-active';
 const classPlaces = 'places__item';
 // Темплейт карточки
 const templateCard = document.querySelector('#card-template').content;
-// функции обработчики
-let handleRemove;
-let handleLike;
-let handleImage;
 
 // Функция создания карточки
 function createCard(element, handleRemoveCard, handleLikeCard, handleImageCard) {
@@ -19,35 +15,15 @@ function createCard(element, handleRemoveCard, handleLikeCard, handleImageCard) 
     cardImage.alt = element.name;
     cardTitle.textContent = element.name;
 
-    if (!handleRemove) {
-        handleRemove = handleRemoveCard;
-    }
-
-    if (!handleLike) {
-        handleLike = handleLikeCard;
-    }
-
-    if (!handleImage) {
-        handleImage = handleImageCard;
-    }
-
-    cardDeleteButton.addEventListener('click', handleRemove);
-    cardLikeButton.addEventListener('click', handleLike);
-    cardImage.addEventListener('click', handleImage);
+    cardDeleteButton.addEventListener('click', handleRemoveCard);
+    cardLikeButton.addEventListener('click', handleLikeCard);
+    cardImage.addEventListener('click', handleImageCard);
 
     return newCard;
 }
 
 // Функция удаления карточки
 function removeCard(itemCard) {
-    const cardDeleteButton = itemCard.querySelector('.card__delete-button');
-    const cardLikeButton = itemCard.querySelector('.card__like-button');
-    const cardImage = itemCard.querySelector('.card__image');
-
-    cardDeleteButton.removeEventListener('click', handleRemove);
-    cardLikeButton.removeEventListener('click', handleLike);
-    cardImage.removeEventListener('click', handleImage);
-
     itemCard.remove();
 }
 

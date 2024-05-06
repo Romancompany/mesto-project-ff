@@ -40,8 +40,10 @@ function handleProfileEditClick(evt) {
 // Прикрепляем обработчик
 profileEditButton.addEventListener('click', handleProfileEditClick);
 
-// Обработчик по клику мышки кнопки редактирования профиля
+// Обработчик по клику мышки кнопки добавления новой карточки
 function handleCardAddClick(evt) {
+    nameNewCard.value = '';
+    linkNewCard.value = '';
     openModal(popupNewCard);
 }
 
@@ -77,7 +79,7 @@ function handleFormNewCardSubmit(evt) {
 formNewCard.addEventListener('submit', handleFormNewCardSubmit);
 
 // прикрепляем обработчик закрытия всем попап
-function closeListener() {
+function initPopupCloseListeners() {
     const popups = [popupProfile, popupNewCard, popupImgCard];
 
     popups.forEach(popup => {
@@ -91,7 +93,7 @@ function closeListener() {
 }
 
 // прикрепляем обработчик закрытия всем попап
-closeListener();
+initPopupCloseListeners();
 
 // Заполнить страницу карточками из массива
 fillCards(initialCards);

@@ -8,9 +8,6 @@ function openModal(popup) {
 
 // Закрыть попап
 function closeModal(popup) {
-    const form = popup.querySelector('form');
-
-    if (form) { form.reset(); }
     popup.classList.remove(classOpened);
     document.removeEventListener('keydown', handleCloseKeyESC);
 }
