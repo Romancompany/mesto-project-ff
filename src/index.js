@@ -1,8 +1,9 @@
 import './pages/index.css';
 import { createCard, handleLikeCardClick, handleRemoveCardClick } from './components/card.js';
-import { initialCards } from './components/cards.js';
+//import { initialCards } from './components/cards.js';
 import { openModal, closeModal, handleOverlayClick } from './components/modal.js';
 import { enableValidation, clearValidation } from './components/validation.js';
+import { getInitialCards, getProfile, patchProfile, postCard } from './components/api.js';
 
 const validationConfig = {
     formSelector: '.popup__form',
@@ -18,6 +19,7 @@ const cardContainer = document.querySelector('.places__list');
 
 // Профиль [profile]
 const profile = document.querySelector('.profile');
+const profileImage = profile.querySelector('.profile__image');
 const profileName = profile.querySelector('.profile__title');
 const profileJob = profile.querySelector('.profile__description');
 const profileEditButton = profile.querySelector('.profile__edit-button');
@@ -66,8 +68,12 @@ cardAddButton.addEventListener('click', handleCardAddClick);
 function handleFormProfileSubmit(evt) {
     evt.preventDefault(); 
 
-    profileName.textContent = nameInput.value;
-    profileJob.textContent = jobInput.value;
+    if (patchProfile(nameInput.value, jobInput.value)) {
+        profileName.textContent = nameInput.value;
+        profileJob.textContent = jobInput.value;
+    } else {
+        alert('Ошибка сохранения профиля на сервере');
+    }
 
     closeModal(popupProfile);
 }
@@ -78,10 +84,15 @@ formProfile.addEventListener('submit', handleFormProfileSubmit);
 // Обработчик «отправки» формы новой карточки
 function handleFormNewCardSubmit(evt) {
     evt.preventDefault(); 
-    const card = {name: nameNewCard.value, link: linkNewCard.value}
-    const newCard = createCard(card, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
 
-    cardContainer.prepend(newCard); 
+    if (postCard(nameNewCard.value, linkNewCard.value)) {
+        const card = {name: nameNewCard.value, link: linkNewCard.value}
+        const newCard = createCard(card, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
+        cardContainer.prepend(newCard); 
+    } else {
+        alert('Ошибка добавления карточки на сервер');
+    }
+
     closeModal(popupNewCard);
 }
 
@@ -102,12 +113,6 @@ function initPopupCloseListeners() {
     );
 }
 
-// Инициализировать прикрепление обработчиков
-initPopupCloseListeners();
-
-// Заполнить страницу карточками из массива
-fillCards(initialCards);
-
 // Обработчик открытия попап изображения
 function handleImageCardClick(evt) {
     const image = evt.target;
@@ -118,13 +123,49 @@ function handleImageCardClick(evt) {
 }
 
 // Заполнить страницу карточками
-function fillCards(cards) {
+function fillCards(cards, profileId) {
     cards.forEach(element => { 
-        const newCard = createCard(element, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
+        const isSelf = (element.owner._id === profileId);
+        const newCard = createCard(element, isSelf, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
         cardContainer.append(newCard); 
-                             }
-                 );
+    }
+    );
 }
+
+// Заполнить страницу карточками
+function fillProfile(profile) {
+    profileName.textContent = profile.name;
+    profileJob.textContent = profile.about;
+    profileImage.style = `background-image: url("${profile.avatar}")`;
+/*
+    {
+        "name": "Jacques Cousteau",
+        "about": "Sailor, researcher",
+        "avatar": "https://pictures.s3.yandex.net/frontend-developer/common/ava.jpg",
+        "_id": "3bfc9fecbf5409d0e3c56c38",
+        "cohort": "wff-cohort-14"
+    }
+*/
+}
+
+// Инициализировать прикрепление обработчиков
+initPopupCloseListeners();
+
+// Заполнить профиль и карточки
+Promise.all([getInitialCards(), getProfile()])
+.then((results) => {
+    const cards = results[0];   // массив карточек
+    const profile = results[1]; // профиль
+
+    // Заполнить профиль
+    fillProfile(profile); 
+    // Заполнить страницу карточками /* fillCards(initialCards); */
+    fillCards(cards, profile._id);
+})
+.catch((err) => { 
+    console.log(err); 
+});
+  
 
 // включение валидации вызовом enableValidation
 enableValidation(validationConfig);
