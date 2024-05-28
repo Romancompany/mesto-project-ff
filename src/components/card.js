@@ -61,10 +61,12 @@ function handleLikeCardClick(evt) {
 
     if (button.classList.contains(classLike)) {
         putLikeCard(cardElement.id)
-        .then(card => { setCountLikeCard(cardElement, card.likes.length); });
+        .then(card => { setCountLikeCard(cardElement, card.likes.length); })
+        .catch(err => console.log(err) );
     } else {
         deleteLikeCard(cardElement.id)
-        .then(card => { setCountLikeCard(cardElement, card.likes.length); });
+        .then(card => { setCountLikeCard(cardElement, card.likes.length); })
+        .catch(err => console.log(err) );
     }
 }
 

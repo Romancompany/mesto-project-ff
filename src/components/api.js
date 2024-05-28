@@ -11,7 +11,7 @@ return fetch(url, head)
       .then(res => {
          if (res.ok) { return res.json(); }
          // если ошибка, отклоняем промис
-         return Promise.reject(`Ошибка WEB сервера: ${res.status}`);
+         return Promise.reject(`Ошибка от WEB-сервера: ${res.status}`);
        });
 }
   
@@ -48,8 +48,8 @@ return fetchJSON(`${config.baseUrl}/cards`
                 , { method: 'POST',
                     headers: config.headers,
                     body: JSON.stringify({
-                        name: nameNew,
-                        link: linkNew
+                            name: nameNew,
+                            link: linkNew
                     })
                   }
                 );
@@ -79,4 +79,15 @@ return fetchJSON(`${config.baseUrl}/cards/likes/${id}`
                 );
 }
 
-export { getInitialCards, getProfile, patchProfile, postCard, deleteCard, putLikeCard, deleteLikeCard };
+const patchAvatarProfile = (url) => {
+return fetchJSON(`${config.baseUrl}/users/me/avatar`
+                , { method: 'PATCH',
+                    headers: config.headers,
+                    body: JSON.stringify({
+                            avatar: url
+                    })
+                  }
+                );
+}
+    
+export { getInitialCards, getProfile, patchProfile, postCard, deleteCard, putLikeCard, deleteLikeCard, patchAvatarProfile };

@@ -1,9 +1,8 @@
 import './pages/index.css';
 import { createCard, handleLikeCardClick, handleRemoveCardClick } from './components/card.js';
-//import { initialCards } from './components/cards.js';
 import { openModal, closeModal, handleOverlayClick } from './components/modal.js';
 import { enableValidation, clearValidation } from './components/validation.js';
-import { getInitialCards, getProfile, patchProfile, postCard } from './components/api.js';
+import { getInitialCards, getProfile, patchProfile, postCard, patchAvatarProfile } from './components/api.js';
 
 const validationConfig = {
     formSelector: '.popup__form',
@@ -25,6 +24,11 @@ const profileJob = profile.querySelector('.profile__description');
 const profileEditButton = profile.querySelector('.profile__edit-button');
 const cardAddButton = profile.querySelector('.profile__add-button');
 
+// Окно редактирования аватара [popup_type_avatar]
+const popupAvatar = document.querySelector('.popup_type_avatar');
+const formAvatar = popupAvatar.querySelector('.popup__form');
+const linkAvatar = formAvatar.querySelector('.popup__input_type_url');
+
 // Окно редактирования профиля [popup_type_edit]
 const popupProfile = document.querySelector('.popup_type_edit');
 const formProfile = popupProfile.querySelector('.popup__form'); 
@@ -42,8 +46,28 @@ const popupImgCard = document.querySelector('.popup_type_image');
 const titleImgCard = popupImgCard.querySelector('.popup__caption');  
 const photoImgCard = popupImgCard.querySelector('.popup__image');  
 
-//
+// ID профиля
 let idProfile;
+let buttonSaveContent;
+
+function startButtonSave(form) {
+    buttonSaveContent = form.button_save.textContent;
+    form.button_save.textContent = 'Сохранение...';
+}
+
+function finallyButtonSave(form) {
+    form.button_save.textContent = buttonSaveContent;
+}
+
+// Обработчик по клику мышки аватара
+function handleAvatarEditClick(evt) {
+    linkAvatar.value = '';
+    clearValidation(formAvatar, validationConfig);
+    openModal(popupAvatar);
+}
+
+// Прикрепляем обработчик редактирования аватара
+profileImage.addEventListener('click', handleAvatarEditClick);
 
 // Обработчик по клику мышки кнопки редактирования профиля
 function handleProfileEditClick(evt) {
@@ -67,10 +91,33 @@ function handleCardAddClick(evt) {
 // Прикрепляем обработчик добавления новой карточки
 cardAddButton.addEventListener('click', handleCardAddClick);
 
+// Обработчик «отправки» аватара
+function handleFormAvatarSubmit(evt) {
+    evt.preventDefault(); 
+
+    startButtonSave(formAvatar);
+    patchAvatarProfile(linkAvatar.value)
+    .then( profile => {
+        if (profile.avatar === linkAvatar.value) {
+            fillProfile(profile);
+        } else {
+            alert('Ошибка сохранения аватара на сервере');
+        }
+    })
+    .catch(err => console.log(err) )
+    .finally(() => finallyButtonSave(formAvatar) );
+
+    closeModal(popupAvatar);
+}
+
+// Прикрепляем обработчик «отправки» к форме аватара
+formAvatar.addEventListener('submit', handleFormAvatarSubmit);
+
 // Обработчик «отправки» формы профиля
 function handleFormProfileSubmit(evt) {
     evt.preventDefault(); 
 
+    startButtonSave(formProfile);
     patchProfile(nameInput.value, jobInput.value)
     .then( profile => {
         if (profile.name === nameInput.value && profile.about === jobInput.value) {
@@ -80,7 +127,8 @@ function handleFormProfileSubmit(evt) {
             alert('Ошибка сохранения профиля на сервере');
         }
     })
-    .catch(err => console.log(err) );
+    .catch(err => console.log(err) )
+    .finally(() => finallyButtonSave(formProfile) );
 
     closeModal(popupProfile);
 }
@@ -92,6 +140,7 @@ formProfile.addEventListener('submit', handleFormProfileSubmit);
 function handleFormNewCardSubmit(evt) {
     evt.preventDefault(); 
 
+    startButtonSave(formNewCard);
     postCard(nameNewCard.value, linkNewCard.value)
     .then(card => {
         if (card.name === nameNewCard.value && card.link === linkNewCard.value) {
@@ -101,24 +150,10 @@ function handleFormNewCardSubmit(evt) {
             alert('Ошибка добавления карточки на сервер');
         }
      })
-     .catch(err => console.log(err) );
-/*
-    {
-        "likes": [],
-        "_id": "6655b73870b696002b945cfb",
-        "name": "TestNRB",
-        "link": "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/arkhyz.jpg",
-        "owner": {
-            "name": "Николаев Роман",
-            "about": "программист",
-            "avatar": "https://pictures.s3.yandex.net/frontend-developer/common/ava.jpg",
-            "_id": "3bfc9fecbf5409d0e3c56c38",
-            "cohort": "wff-cohort-14"
-        },
-        "createdAt": "2024-05-28T10:51:36.227Z"
-    }    
-*/
-    closeModal(popupNewCard);
+     .catch(err => console.log(err) )
+     .finally(() => finallyButtonSave(formNewCard) );
+
+     closeModal(popupNewCard);
 }
 
 // Прикрепляем обработчик «отправки» к форме новой карточки
@@ -126,7 +161,7 @@ formNewCard.addEventListener('submit', handleFormNewCardSubmit);
 
 // Прикрепляем обработчики закрытия всех попап
 function initPopupCloseListeners() {
-    const popups = [popupProfile, popupNewCard, popupImgCard];
+    const popups = [popupAvatar, popupProfile, popupNewCard, popupImgCard];
 
     popups.forEach(popup => {
         const button = popup.querySelector('.popup__close');
@@ -160,16 +195,8 @@ function fillCards(cards) {
 function fillProfile(profile) {
     profileName.textContent = profile.name;
     profileJob.textContent = profile.about;
+    // оригинал:  https://pictures.s3.yandex.net/frontend-developer/common/ava.jpg
     profileImage.style = `background-image: url("${profile.avatar}")`;
-/*
-    {
-        "name": "Jacques Cousteau",
-        "about": "Sailor, researcher",
-        "avatar": "https://pictures.s3.yandex.net/frontend-developer/common/ava.jpg",
-        "_id": "3bfc9fecbf5409d0e3c56c38",
-        "cohort": "wff-cohort-14"
-    }
-*/
 }
 
 // Инициализировать прикрепление обработчиков
@@ -184,7 +211,7 @@ Promise.all([getInitialCards(), getProfile()])
     // Заполнить профиль
     fillProfile(profile); 
     idProfile = profile._id;
-    // Заполнить страницу карточками /* fillCards(initialCards); */
+    // Заполнить страницу карточками
     fillCards(cards);
 })
 .catch(err => console.log(err) );

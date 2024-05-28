@@ -9,6 +9,22 @@
   margin: 0 29px 0 0;
 }
 
+.profile__image:hover {
+  opacity: 0.4;
+}
+
+.profile__image-edit {
+  /*
+  display: block;
+  object-fit: cover;
+  object-position: 50px top;
+  */
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: auto;
+}
+
 @media screen and (max-width: 740px) {
   .profile__image {
     margin: 0 10px 0 0;
