@@ -42,6 +42,9 @@ const popupImgCard = document.querySelector('.popup_type_image');
 const titleImgCard = popupImgCard.querySelector('.popup__caption');  
 const photoImgCard = popupImgCard.querySelector('.popup__image');  
 
+//
+let idProfile;
+
 // Обработчик по клику мышки кнопки редактирования профиля
 function handleProfileEditClick(evt) {
     nameInput.value = profileName.textContent;
@@ -68,12 +71,16 @@ cardAddButton.addEventListener('click', handleCardAddClick);
 function handleFormProfileSubmit(evt) {
     evt.preventDefault(); 
 
-    if (patchProfile(nameInput.value, jobInput.value)) {
-        profileName.textContent = nameInput.value;
-        profileJob.textContent = jobInput.value;
-    } else {
-        alert('Ошибка сохранения профиля на сервере');
-    }
+    patchProfile(nameInput.value, jobInput.value)
+    .then( profile => {
+        if (profile.name === nameInput.value && profile.about === jobInput.value) {
+            profileName.textContent = nameInput.value;
+            profileJob.textContent = jobInput.value;
+        } else {
+            alert('Ошибка сохранения профиля на сервере');
+        }
+    })
+    .catch(err => console.log(err) );
 
     closeModal(popupProfile);
 }
@@ -85,14 +92,32 @@ formProfile.addEventListener('submit', handleFormProfileSubmit);
 function handleFormNewCardSubmit(evt) {
     evt.preventDefault(); 
 
-    if (postCard(nameNewCard.value, linkNewCard.value)) {
-        const card = {name: nameNewCard.value, link: linkNewCard.value}
-        const newCard = createCard(card, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
-        cardContainer.prepend(newCard); 
-    } else {
-        alert('Ошибка добавления карточки на сервер');
-    }
-
+    postCard(nameNewCard.value, linkNewCard.value)
+    .then(card => {
+        if (card.name === nameNewCard.value && card.link === linkNewCard.value) {
+            const newCard = createCard(card, idProfile, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
+            cardContainer.prepend(newCard); 
+        } else {
+            alert('Ошибка добавления карточки на сервер');
+        }
+     })
+     .catch(err => console.log(err) );
+/*
+    {
+        "likes": [],
+        "_id": "6655b73870b696002b945cfb",
+        "name": "TestNRB",
+        "link": "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/arkhyz.jpg",
+        "owner": {
+            "name": "Николаев Роман",
+            "about": "программист",
+            "avatar": "https://pictures.s3.yandex.net/frontend-developer/common/ava.jpg",
+            "_id": "3bfc9fecbf5409d0e3c56c38",
+            "cohort": "wff-cohort-14"
+        },
+        "createdAt": "2024-05-28T10:51:36.227Z"
+    }    
+*/
     closeModal(popupNewCard);
 }
 
@@ -123,10 +148,9 @@ function handleImageCardClick(evt) {
 }
 
 // Заполнить страницу карточками
-function fillCards(cards, profileId) {
+function fillCards(cards) {
     cards.forEach(element => { 
-        const isSelf = (element.owner._id === profileId);
-        const newCard = createCard(element, isSelf, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
+        const newCard = createCard(element, idProfile, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
         cardContainer.append(newCard); 
     }
     );
@@ -153,19 +177,17 @@ initPopupCloseListeners();
 
 // Заполнить профиль и карточки
 Promise.all([getInitialCards(), getProfile()])
-.then((results) => {
+.then(results => {
     const cards = results[0];   // массив карточек
     const profile = results[1]; // профиль
 
     // Заполнить профиль
     fillProfile(profile); 
+    idProfile = profile._id;
     // Заполнить страницу карточками /* fillCards(initialCards); */
-    fillCards(cards, profile._id);
+    fillCards(cards);
 })
-.catch((err) => { 
-    console.log(err); 
-});
+.catch(err => console.log(err) );
   
-
 // включение валидации вызовом enableValidation
 enableValidation(validationConfig);

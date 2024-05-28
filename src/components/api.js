@@ -1,103 +1,82 @@
 const config = {
     baseUrl: 'https://nomoreparties.co/v1/wff-cohort-14',
-    headers: {
-      authorization: 'a2475588-c201-48b3-b1ec-e921a3f3b495',
-      'Content-Type': 'application/json'
+    headers: {  
+        authorization: 'a2475588-c201-48b3-b1ec-e921a3f3b495',
+        'Content-Type': 'application/json'
     }
+}
+
+const fetchJSON = (url, head) => {
+return fetch(url, head)
+      .then(res => {
+         if (res.ok) { return res.json(); }
+         // если ошибка, отклоняем промис
+         return Promise.reject(`Ошибка WEB сервера: ${res.status}`);
+       });
 }
   
 const getInitialCards = () => {
-    return fetch(`${config.baseUrl}/cards`, {
-      headers: config.headers
-    })
-      .then(res => {
-        if (res.ok) {
-          return res.json();
-        }
-        // если ошибка, отклоняем промис
-        return Promise.reject(`Ошибка: ${res.status}`);
-      });
+return fetchJSON(`${config.baseUrl}/cards`
+                , { method: 'GET',
+                    headers: config.headers
+                  }
+                );
 }
 
 const getProfile = () => {
-    return fetch(`${config.baseUrl}/users/me`, {
-      headers: config.headers
-    })
-      .then(res => {
-        if (res.ok) {
-          return res.json();
-        }
-        // если ошибка, отклоняем промис
-        return Promise.reject(`Ошибка: ${res.status}`);
-      });
+return fetchJSON(`${config.baseUrl}/users/me`
+                , { method: 'GET',
+                    headers: config.headers
+                  }
+                );
 }
 
 const patchProfile = (nameEdit, aboutEdit) => {
-   return fetch(`${config.baseUrl}/users/me`, {
-      method: 'PATCH',
-      headers: config.headers,
-      body: JSON.stringify({
-        name: nameEdit,
-        about: aboutEdit
-      })
-    })
-    .then(res => {
-        if (res.ok) {
-          return res.json();
-        }
-        // если ошибка, отклоняем промис
-        return Promise.reject(`Ошибка: ${res.status}`);
-      })
-    .then(profile => {
-        return (profile.name === nameEdit && profile.about === aboutEdit);
-    })
-    .catch(err => { 
-        console.log(err);
-        return false;
-    });
+return fetchJSON(`${config.baseUrl}/users/me`
+                , { method: 'PATCH',
+                    headers: config.headers,
+                    body: JSON.stringify({
+                            name: nameEdit,
+                            about: aboutEdit
+                        })
+                  }
+                );
 }
 
 const postCard = (nameNew, linkNew) => {
-    return fetch(`${config.baseUrl}/cards`, {
-       method: 'POST',
-       headers: config.headers,
-       body: JSON.stringify({
-         name: nameNew,
-         link: linkNew
-       })
-     })
-     .then(res => {
-         if (res.ok) {
-           return res.json();
-         }
-         // если ошибка, отклоняем промис
-         return Promise.reject(`Ошибка: ${res.status}`);
-       })
-     .then(card => {
-         return (card.name === nameNew && card.link === linkNew);
-     })
-     .catch(err => { 
-         console.log(err);
-         return false;
-     });
+return fetchJSON(`${config.baseUrl}/cards`
+                , { method: 'POST',
+                    headers: config.headers,
+                    body: JSON.stringify({
+                        name: nameNew,
+                        link: linkNew
+                    })
+                  }
+                );
 }
 
 const deleteCard = (id) => {
-    return fetch(`${config.baseUrl}/cards/${id}`, {
-       method: 'DELETE',
-       headers: config.headers,
-     })
-     .then(res => {
-         if (res.ok) {
-           return res.json();
-         }
-         // если ошибка, отклоняем промис
-         return Promise.reject(`Ошибка: ${res.status}`);
-       })
-     .catch(err => { 
-         console.log(err);
-         return false;
-     });
- }
+return fetchJSON(`${config.baseUrl}/cards/${id}`
+                , { method: 'DELETE',
+                    headers: config.headers
+                  }
+                );
+}
 
-export { getInitialCards, getProfile, patchProfile, postCard, deleteCard };
+const putLikeCard = (id) => {
+return fetchJSON(`${config.baseUrl}/cards/likes/${id}`
+                , { method: 'PUT',
+                    headers: config.headers
+                  }
+                );
+}
+
+const deleteLikeCard = (id) => {
+return fetchJSON(`${config.baseUrl}/cards/likes/${id}`
+                , { method: 'DELETE',
+                    headers: config.headers
+                  }
+                );
+}
+
+export { getInitialCards, getProfile, patchProfile, postCard, deleteCard, putLikeCard, deleteLikeCard };
