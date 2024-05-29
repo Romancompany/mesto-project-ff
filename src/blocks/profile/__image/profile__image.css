@@ -7,22 +7,41 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  cursor: pointer;
+  position: relative;
 }
 
-.profile__image:hover {
-  opacity: 0.4;
+.profile__image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 300ms;
 }
 
-.profile__image-edit {
-  /*
-  display: block;
-  object-fit: cover;
-  object-position: 50px top;
-  */
-  display: block;
-  width: 26px;
-  height: 26px;
-  margin: auto;
+.profile__image:hover::before {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.profile__image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url(../../../images/edit-icon.svg);
+  background-size: 26px;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+.profile__image:hover::after {
+  content: '';
+  position: absolute;
+  opacity: 1;
 }
 
 @media screen and (max-width: 740px) {

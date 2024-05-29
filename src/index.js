@@ -100,14 +100,13 @@ function handleFormAvatarSubmit(evt) {
     .then( profile => {
         if (profile.avatar === linkAvatar.value) {
             fillProfile(profile);
+            closeModal(popupAvatar);
         } else {
             alert('Ошибка сохранения аватара на сервере');
         }
     })
-    .catch(err => console.log(err) )
+    .catch(err => alert(err) )
     .finally(() => finallyButtonSave(formAvatar) );
-
-    closeModal(popupAvatar);
 }
 
 // Прикрепляем обработчик «отправки» к форме аватара
@@ -123,14 +122,13 @@ function handleFormProfileSubmit(evt) {
         if (profile.name === nameInput.value && profile.about === jobInput.value) {
             profileName.textContent = nameInput.value;
             profileJob.textContent = jobInput.value;
+            closeModal(popupProfile);
         } else {
             alert('Ошибка сохранения профиля на сервере');
         }
     })
-    .catch(err => console.log(err) )
+    .catch(err => alert(err) )
     .finally(() => finallyButtonSave(formProfile) );
-
-    closeModal(popupProfile);
 }
 
 // Прикрепляем обработчик «отправки» к форме профиля
@@ -146,14 +144,14 @@ function handleFormNewCardSubmit(evt) {
         if (card.name === nameNewCard.value && card.link === linkNewCard.value) {
             const newCard = createCard(card, idProfile, handleRemoveCardClick, handleLikeCardClick, handleImageCardClick);
             cardContainer.prepend(newCard); 
+            closeModal(popupNewCard);
         } else {
             alert('Ошибка добавления карточки на сервер');
         }
      })
-     .catch(err => console.log(err) )
+     .catch(err => alert(err) )
      .finally(() => finallyButtonSave(formNewCard) );
 
-     closeModal(popupNewCard);
 }
 
 // Прикрепляем обработчик «отправки» к форме новой карточки
