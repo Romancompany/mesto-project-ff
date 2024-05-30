@@ -82,8 +82,7 @@ profileEditButton.addEventListener('click', handleProfileEditClick);
 
 // Обработчик по клику мышки кнопки добавления новой карточки
 function handleCardAddClick(evt) {
-    nameNewCard.value = '';
-    linkNewCard.value = '';
+    formNewCard.reset();
     clearValidation(popupNewCard, validationConfig);
     openModal(popupNewCard);
 }

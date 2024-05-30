@@ -57,15 +57,19 @@ function handleLikeCardClick(evt) {
     const button = evt.target;
     const cardElement = button.closest('.' + classPlaces);
 
-    button.classList.toggle(classLike);
-
-    if (button.classList.contains(classLike)) {
+    if (!button.classList.contains(classLike)) {
         putLikeCard(cardElement.id)
-        .then(card => { setCountLikeCard(cardElement, card.likes.length); })
+        .then(card => { 
+            button.classList.add(classLike);
+            setCountLikeCard(cardElement, card.likes.length); 
+        })
         .catch(err => console.log(err) );
     } else {
         deleteLikeCard(cardElement.id)
-        .then(card => { setCountLikeCard(cardElement, card.likes.length); })
+        .then(card => { 
+            button.classList.remove(classLike);
+            setCountLikeCard(cardElement, card.likes.length); 
+        })
         .catch(err => console.log(err) );
     }
 }
